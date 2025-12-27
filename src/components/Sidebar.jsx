@@ -14,6 +14,7 @@ import {
 import { AuthContext } from "../contexts/AuthContext";
 import { auth } from "../firebase";
 import apiClient from "../api";   // ✅ FIXED IMPORT
+import { assets } from "../assets/assets";
 
 const navItems = [
   { to: "/ai", label: "Dashboard", Icon: House },
@@ -55,13 +56,12 @@ const Sidebar = ({ sidebar, setSidebar }) => {
 
   return (
     <div
-      className={`w-60 bg-white border-r border-gray-200 flex flex-col justify-between items-center max-sm:absolute top-14 bottom-0 ${
-        sidebar ? "translate-x-0" : "max-sm:-translate-x-full"
-      } transition-all duration-300 ease-in-out`}
+      className={`w-60 bg-white border-r border-gray-200 flex flex-col justify-between items-center max-sm:absolute top-14 bottom-0 ${sidebar ? "translate-x-0" : "max-sm:-translate-x-full"
+        } transition-all duration-300 ease-in-out`}
     >
       <div className="my-7 w-full">
         <img
-          src={user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+          src={assets.profile_img_1}
           alt="User avatar"
           className="w-14 h-14 rounded-full mx-auto"
         />
@@ -77,10 +77,9 @@ const Sidebar = ({ sidebar, setSidebar }) => {
               end={to === "/ai"}
               onClick={() => setSidebar(false)}
               className={({ isActive }) =>
-                `px-3.5 py-2.5 flex items-center gap-3 rounded ${
-                  isActive
-                    ? "bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white"
-                    : ""
+                `px-3.5 py-2.5 flex items-center gap-3 rounded ${isActive
+                  ? "bg-gradient-to-r from-[#3C81F6] to-[#9234EA] text-white"
+                  : ""
                 }`
               }
             >
@@ -98,9 +97,9 @@ const Sidebar = ({ sidebar, setSidebar }) => {
       <div className="w-full border-t border-gray-200 p-4 px-7 flex items-center justify-between">
         <div className="flex gap-2 items-center">
           <img
-            src={user.photoURL || "https://cdn-icons-png.flaticon.com/512/149/149071.png"}
+            src={assets.profile_img_1}
             className="w-8 h-8 rounded-full"
-            alt=""
+            alt="User avatar"
           />
           <div>
             <h1 className="text-sm font-medium">{user.displayName || user.email}</h1>

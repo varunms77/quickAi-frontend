@@ -1,4 +1,4 @@
-import { Eraser, Sparkles } from "lucide-react";
+import { Eraser, Sparkles, Download } from "lucide-react";
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -7,6 +7,24 @@ import { AuthContext } from "../contexts/AuthContext";
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const RemoveBackground = () => {
+  // Function to download image
+  const downloadImage = async (imageUrl, filename = "processed-image.png") => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Image downloaded successfully!");
+    } catch (error) {
+      toast.error("Failed to download image");
+    }
+  };
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
@@ -102,7 +120,16 @@ const RemoveBackground = () => {
             </div>
           </div>
         ) : (
-          <img src={content} alt="result" className="mt-3 w-full h-full" />
+          <div className="mt-3 flex flex-col">
+            <img src={content} alt="result" className="w-full rounded-lg" />
+            <button
+              onClick={() => downloadImage(content, `bg-removed-${Date.now()}.png`)}
+              className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-[#F6AB41] to-[#FF4938] text-white px-4 py-2 text-sm rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              <Download className="w-4 h-4" />
+              Download Image
+            </button>
+          </div>
         )}
       </div>
     </div>

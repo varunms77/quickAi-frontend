@@ -1,4 +1,4 @@
-import { Image, Sparkles } from "lucide-react";
+import { Image, Sparkles, Download } from "lucide-react";
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -8,6 +8,24 @@ import { auth } from "../firebase";
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const GenerateImages = () => {
+  // Function to download image
+  const downloadImage = async (imageUrl, filename = "generated-image.png") => {
+    try {
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Image downloaded successfully!");
+    } catch (error) {
+      toast.error("Failed to download image");
+    }
+  };
   const imageStyle = [
     "Realistic",
     "Ghibli style",
@@ -91,11 +109,10 @@ const GenerateImages = () => {
             <span
               key={item}
               onClick={() => setSelectedStyle(item)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${
-                selectedStyle === item
-                  ? "bg-green-50 text-green-700"
-                  : "text-gray-500 border-gray-300"
-              }`}
+              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${selectedStyle === item
+                ? "bg-green-50 text-green-700"
+                : "text-gray-500 border-gray-300"
+                }`}
             >
               {item}
             </span>
@@ -147,8 +164,15 @@ const GenerateImages = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-3 h-full">
-            <img src={content} alt="Generated" className="w-full h-full rounded-lg" />
+          <div className="mt-3 h-full flex flex-col">
+            <img src={content} alt="Generated" className="w-full flex-1 rounded-lg object-cover" />
+            <button
+              onClick={() => downloadImage(content, `generated-image-${Date.now()}.png`)}
+              className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-[#00AD25] to-[#04FF50] text-white px-4 py-2 text-sm rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              <Download className="w-4 h-4" />
+              Download Image
+            </button>
           </div>
         )}
       </div>

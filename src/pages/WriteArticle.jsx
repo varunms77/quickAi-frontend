@@ -1,4 +1,4 @@
-import { Edit, Sparkles } from "lucide-react";
+import { Edit, Sparkles, Download } from "lucide-react";
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -8,6 +8,27 @@ import { AuthContext } from "../contexts/AuthContext";
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
 
 const WriteArticle = () => {
+  // Function to download article as a document
+  const downloadAsDocument = (content, filename = "article.txt") => {
+    // Convert markdown to plain text (basic conversion)
+    const plainText = content
+      .replace(/#{1,6}\s/g, "") // Remove headers
+      .replace(/\*\*(.*?)\*\*/g, "$1") // Remove bold
+      .replace(/\*(.*?)\*/g, "$1") // Remove italic
+      .replace(/`(.*?)`/g, "$1") // Remove inline code
+      .replace(/\[(.*?)\]\(.*?\)/g, "$1"); // Convert links to text
+
+    const blob = new Blob([plainText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Article downloaded successfully!");
+  };
   const articleLength = [
     { length: 800, text: "Short (500-800 words)" },
     { length: 1200, text: "Medium (800-1200 words)" },
@@ -84,11 +105,10 @@ const WriteArticle = () => {
           {articleLength.map((item, index) => (
             <span
               onClick={() => setSelectedLength(item)}
-              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${
-                selectedLength.text === item.text
+              className={`text-xs px-4 py-1 border rounded-full cursor-pointer ${selectedLength.text === item.text
                   ? "bg-blue-50 text-blue-700"
                   : "text-gray-500 border-gray-300"
-              }`}
+                }`}
               key={index}
             >
               {item.text}
@@ -124,10 +144,17 @@ const WriteArticle = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-600">
-            <div className="reset-tw">
+          <div className="mt-3 h-full overflow-y-scroll text-sm text-slate-600 flex flex-col">
+            <div className="reset-tw flex-1">
               <Markdown>{content}</Markdown>
             </div>
+            <button
+              onClick={() => downloadAsDocument(content, `article-${Date.now()}.txt`)}
+              className="mt-4 flex items-center justify-center gap-2 bg-gradient-to-r from-[#226BFF] to-[#65ADFF] text-white px-4 py-2 text-sm rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              <Download className="w-4 h-4" />
+              Download Document
+            </button>
           </div>
         )}
       </div>
